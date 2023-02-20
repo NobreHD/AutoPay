@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "autopay",
+  "version": "${version}",
+  "name": "AutoPay",
+  "description": "Client-side mod that simplifies wealth distribution",
+  "authors": [
+    "NobreHD"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/autopay/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "pt.nobrehd.autopay.client.AutopayClient"
+    ],
+    "main": [
+      "pt.nobrehd.autopay.AutoPay"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "fabric": "*",
+    "minecraft": "1.19.2"
+  }
+}
