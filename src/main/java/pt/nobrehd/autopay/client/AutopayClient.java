@@ -10,6 +10,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import pt.nobrehd.autopay.Utils;
 
@@ -46,23 +47,23 @@ public class AutopayClient implements ClientModInitializer {
                         if (MinecraftClient.getInstance().getCurrentServerEntry() != null){
                             String server = MinecraftClient.getInstance().getCurrentServerEntry().address;
                             int amount = IntegerArgumentType.getInteger(ctx, "amount");
-                            new Thread(() -> {
-                                String pattern = Utils.getPattern(server);
-                                int delay = Utils.getDelay(server);
-                                if (pattern != null && delay != 0) {
-                                    for (String name: player.getServer().getPlayerNames()){
-                                        String command = pattern.replace("%player%", name).replace("%amount%", String.valueOf(amount));
-                                        player.sendChatMessage(command, null);
+                            String pattern = Utils.getPattern(server);
+                            int delay = Utils.getDelay(server);
+                            if (pattern != null && delay != 0) {
+                                new Thread(() -> {
+                                    for (PlayerListEntry players: player.networkHandler.getPlayerList()) {
+                                        String command = pattern.replace("%player%", players.getProfile().getName()).replace("%amount%", String.valueOf(amount));
                                         try {
                                             Thread.sleep(delay);
+                                            player.sendCommand(command);
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
                                     }
-                                } else {
-                                    player.sendMessage(Utils.format("No config found for " + server), false);
-                                }
-                            }).start();
+                                }).start();
+                            } else {
+                                player.sendMessage(Utils.format("No config found for " + server), false);
+                            }
                         } else {
                             player.sendMessage(Utils.format("This command can only be used in a server"), false);
                         }
